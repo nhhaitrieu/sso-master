@@ -11,6 +11,11 @@ public class TestController {
         return "Hello Word";
     }
 
+    @GetMapping("/testGit")
+    public String testGit() {
+        return "Hello Git";
+    }
+
 
     @PostMapping("/demo")
     public String demo(@RequestParam("name") String name) {
