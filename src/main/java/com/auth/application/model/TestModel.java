@@ -8,7 +8,4 @@ import lombok.Data;
 public class TestModel {
     private String name;
     private String age;
-
-
-
 }
