@@ -1,6 +1,5 @@
 package com.auth.application.model;
 
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -9,16 +8,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "Password")
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Password {
+public class OTPTokenResponse {
 
-    @XmlElement(name = "Value")
-    private String value;
+    @XmlElement(name = "UserID")
+    private String userID;
+    @XmlElement(name = "AuthentiactionDate")
+    private LocalDateTime authentiactionDate;
 
-    @XmlElement(name = "Format")
-    private String format;
+
 }
