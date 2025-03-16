@@ -19,8 +19,8 @@ public class OTPTokenResponse {
 
     @XmlElement(name = "UserID")
     private String userID;
-    @XmlElement(name = "AuthentiactionDate")
-    private LocalDateTime authentiactionDate;
+    @XmlElement(name = "AuthenticationDate")
+    private String authenticationDate;
 
 
 }

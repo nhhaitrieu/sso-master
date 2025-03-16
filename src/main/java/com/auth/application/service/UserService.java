@@ -3,7 +3,6 @@ package com.auth.application.service;
 import com.auth.application.model.ResponseObject;
 import com.auth.application.model.Role;
 import com.auth.application.model.User;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
