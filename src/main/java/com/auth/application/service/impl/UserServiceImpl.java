@@ -5,8 +5,6 @@ import com.auth.application.model.*;
 import com.auth.application.repository.RoleRepository;
 import com.auth.application.repository.UserRepository;
 import com.auth.application.service.UserService;
-import com.fasterxml.jackson.databind.DatabindContext;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,9 +25,12 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
 
     @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    
+
 
     @Override
     public User saveUser(User user) {
@@ -97,6 +98,8 @@ public class UserServiceImpl implements UserService {
     public User findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

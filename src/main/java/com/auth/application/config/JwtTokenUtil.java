@@ -77,5 +77,14 @@ public class JwtTokenUtil implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-
+    public void addJwtToCookie(HttpServletResponse response, String jwt) {
+        ResponseCookie cookie = ResponseCookie.from("JWT_TOKEN", jwt)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .sameSite("None")
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 }

@@ -27,11 +27,14 @@ public class User {
 
     @XmlElement(name = "UserID")
     @NotNull(message = "Username cannot be null")
-    @Email(message = "Invalid email format")
     private String username;
 
     @XmlElement(name = "Password")
     private String password;
+
+    @XmlElement(name = "Email")
+    @Email(message = "Invalid email format")
+    private String email;
 
     @XmlElement(name = "Role")
     @NotNull(message = "Role cannot be null")

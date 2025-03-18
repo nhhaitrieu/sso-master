@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
     User saveUser(User user);
-
     Role saveRole(Role role);
     void addToUser(String username, String rolename);
     List<User> getAllUsers();
