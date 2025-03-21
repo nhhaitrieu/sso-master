@@ -18,7 +18,7 @@ public interface UserService extends UserDetailsService {
     User getUserById(Long id);
     Object updateUser(Long id, User updatedUser);
     ResponseEntity<ResponseObject> deleteUser(Long id); //
-
+    User findUserByEmail(String email);
     User findUserByUsername(String userName);
 
 

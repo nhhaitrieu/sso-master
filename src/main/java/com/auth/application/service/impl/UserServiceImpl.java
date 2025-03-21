@@ -38,6 +38,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    public void updatePassword(User user, String newPassword) {
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("New password must not be empty");
+        }
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+    }
+
 
     @Override
     public Role saveRole(Role role) {
@@ -92,6 +101,11 @@ public class UserServiceImpl implements UserService {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("ERROR", "User not found", ""));
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override

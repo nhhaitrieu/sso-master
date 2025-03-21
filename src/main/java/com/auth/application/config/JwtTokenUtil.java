@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -15,14 +16,19 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
 
     public static final long JWT_TOKEN_VALIDITY = 1 * 60 * 60;
+
+    public static final long RESET_TOKEN_VALIDITY = 15 * 60 * 1000; // 15m
+
 
     @Value("${jwt.secret}")
     private String secret;
@@ -44,6 +50,10 @@ public class JwtTokenUtil implements Serializable {
     //for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    }
+
+    public String getTypeFromToken(String token) {
+        return (String) getAllClaimsFromToken(token).get("type");
     }
 
     //check if the token has expired
@@ -86,5 +96,43 @@ public class JwtTokenUtil implements Serializable {
                 .sameSite("None")
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    // 🔵 Sinh Login Token (1h)
+    public String generateLoginToken(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "LOGIN");
+        return buildToken(claims, email, JWT_TOKEN_VALIDITY);
+    }
+
+
+    // 🔵 Sinh Reset Password Token (15m)
+    public String generateResetPasswordToken(String email) {
+        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "RESET_PASSWORD");
+        claims.put("otp", otp);
+
+        log.info("Generated OTP for {} is {}", email, otp);
+        return buildToken(claims, email, RESET_TOKEN_VALIDITY);
+    }
+
+    public String getOtpFromToken(String token) {
+        return (String) getAllClaimsFromToken(token).get("otp");
+    }
+
+    private String buildToken(Map<String, Object> claims, String subject, long validity) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + validity))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
+    // Cụ thể hóa cho Reset Token (để dễ đọc code)
+    public boolean isResetTokenExpired(String token) {
+        return isTokenExpired(token);
     }
 }

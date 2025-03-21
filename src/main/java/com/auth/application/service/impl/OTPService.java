@@ -30,6 +30,9 @@ public class OTPService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    private final Map<String, String> otpStorage = new HashMap<>();
+
+
     public ResponseEntity<OTPTokenResponse> processTokenRequest(OTPTokenRequest otpTokenRequest, HttpServletResponse response) {
         String decodeUsername = otpTokenRequest.getUserID();
         String decodePassword = otpTokenRequest.getPassword().getValue();
@@ -75,5 +78,23 @@ public class OTPService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
+    }
+
+    // Tạo OTP và lưu vào cache/memory
+    public String generateOTP(String email) {
+        String otp = String.valueOf((int)((Math.random() * 900000) + 100000)); // Random 6 digits
+        otpStorage.put(email, otp);
+        return otp;
+    }
+
+    // Validate OTP
+    public boolean validateOTP(String email, String otp) {
+        String storedOtp = otpStorage.get(email);
+        return storedOtp != null && storedOtp.equals(otp);
+    }
+
+    // Xóa OTP sau khi dùng
+    public void clearOTP(String email) {
+        otpStorage.remove(email);
     }
 }

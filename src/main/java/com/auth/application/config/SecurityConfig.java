@@ -47,6 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/generatetoken").permitAll() // Cho phép truy cập API login
                         .requestMatchers("/api/otp/token").permitAll()
+                        .requestMatchers("/api/otp/forget-password").permitAll()
+                        .requestMatchers("/api/otp/reset-password").permitAll()
                         .requestMatchers("/api/otp/**").authenticated() // Các API khác cần xác thực
                         .requestMatchers("/api/v1/**").authenticated() // Các API khác cần xác thực
                         .requestMatchers("/user/api/v1/**").authenticated() // Các API khác cần xác thực
