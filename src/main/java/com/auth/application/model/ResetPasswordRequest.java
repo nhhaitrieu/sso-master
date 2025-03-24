@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ResetPasswordRequest {
 
-    @XmlElement(name = "Email")
-    private String email;
     @XmlElement(name = "Token")
     private String token;
     @XmlElement(name = "Otp")

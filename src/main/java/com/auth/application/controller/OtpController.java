@@ -6,6 +6,7 @@ import com.auth.application.service.impl.ForgetPasswordService;
 import com.auth.application.service.impl.OTPService;
 import com.auth.application.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -39,7 +40,7 @@ public class OtpController {
     }
 
     @PostMapping(value = "/create", produces = "application/xml")
-    public ResponseEntity<User> createUser(@RequestBody User user, HttpServletResponse response) {
+    public ResponseEntity<User> createUser(@RequestBody  @Valid User user, HttpServletResponse response) {
         log.info("Creating user with userID: {}", user.getUsername());
         if (userServiceImpl.findUserByUsername(user.getUsername()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -47,7 +48,7 @@ public class OtpController {
         // **🔹 2. Mã hóa mật khẩu & Lưu User vào database**
         User createdUser = userServiceImpl.saveUser(user);
         // **🔹 3. Trả về Response**
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PostMapping(value = "/forget-password", produces = "application/xml")
@@ -70,14 +71,11 @@ public class OtpController {
             String email = jwtTokenUtil.getUsernameFromToken(request.getToken());
 
             log.info("Reset password for email: {}", email);
-
             // 🔹 Get OTP từ token
             String otpFromToken = jwtTokenUtil.getOtpFromToken(request.getToken());
-
             if (!otpFromToken.equals(request.getOtp())) {
                 throw new RuntimeException("Invalid OTP");
             }
-
             // Reset password
             forgetPasswordService.resetPassword(request.getToken(), request.getNewPassword());
 

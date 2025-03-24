@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -30,6 +31,9 @@ public class OTPService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private final Map<String, String> otpStorage = new HashMap<>();
 
 
@@ -40,23 +44,15 @@ public class OTPService {
         try {
             User findUserName = userServiceImpl.findUserByUsername(decodeUsername);
 
-            if (findUserName != null && decodePassword.equals(findUserName.getPassword())) {
+            if (findUserName != null && passwordEncoder.matches(decodePassword, findUserName.getPassword())) {
                 log.info("User {} authenticated successfully", decodeUsername);
                 //Copy UserName tử database sang UserDetails
                 final UserDetails userDetails = new org.springframework.security.core.userdetails.User(decodeUsername, decodePassword, new ArrayList<>());
 
                 final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-                ResponseCookie cookie = ResponseCookie.from("JWT_TOKEN", jwt)
-                        .httpOnly(true)   // Chỉ HTTP, không cho JavaScript truy cập
-                        .secure(true)    // Đổi thành `true` nếu dùng HTTPS
-                        .path("/")        // Cookie có hiệu lực trên toàn bộ ứng dụng
-                        .maxAge(Duration.ofHours(1)) // Hết hạn sau 1 giờ
-                        .sameSite("None")  // Nếu gọi API từ frontend khác domain
-                        .secure(true)
-                        .build();
-
-                response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                log.info("JWT added to cookie: {}", jwt);
+                jwtTokenUtil.addJwtToCookie(response, jwt);
 
                 // **🔹 5. Trả về Token trong Response**
                 Map<String, String> responseBody = new HashMap<>();
