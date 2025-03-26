@@ -107,12 +107,10 @@ public class JwtTokenUtil implements Serializable {
 
 
     // 🔵 Sinh Reset Password Token (15m)
-    public String generateResetPasswordToken(String email) {
-        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
+    public String generateResetPasswordToken(String email, String otp) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "RESET_PASSWORD");
         claims.put("otp", otp);
-
         log.info("Generated OTP for {} is {}", email, otp);
         return buildToken(claims, email, RESET_TOKEN_VALIDITY);
     }

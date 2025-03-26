@@ -40,52 +40,17 @@ public class OtpController {
     }
 
     @PostMapping(value = "/create", produces = "application/xml")
-    public ResponseEntity<User> createUser(@RequestBody  @Valid User user, HttpServletResponse response) {
-        log.info("Creating user with userID: {}", user.getUsername());
-        if (userServiceImpl.findUserByUsername(user.getUsername()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        // **🔹 2. Mã hóa mật khẩu & Lưu User vào database**
-        User createdUser = userServiceImpl.saveUser(user);
-        // **🔹 3. Trả về Response**
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user) {
+        return userServiceImpl.createUser(user);
     }
 
     @PostMapping(value = "/forget-password", produces = "application/xml")
     public ResponseEntity<ForgetPasswordResponse> forgetPassword(@RequestBody ForgetPasswordRequest request) {
-        try {
-            forgetPasswordService.processForgetPassword(request.getEmail());
-            ForgetPasswordResponse response = new ForgetPasswordResponse("SUCCESS", "Reset token sent to your email");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error in forgetPassword: ", e);
-            ForgetPasswordResponse response = new ForgetPasswordResponse("FAILURE", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        return forgetPasswordService.handleForgetPassword(request.getEmail());
     }
 
     @PostMapping(value = "/reset-password", produces = "application/xml")
     public ResponseEntity<ResetPasswordResponse> resetPassword(@RequestBody ResetPasswordRequest request) {
-        try {
-            // Lấy email từ token
-            String email = jwtTokenUtil.getUsernameFromToken(request.getToken());
-
-            log.info("Reset password for email: {}", email);
-            // 🔹 Get OTP từ token
-            String otpFromToken = jwtTokenUtil.getOtpFromToken(request.getToken());
-            if (!otpFromToken.equals(request.getOtp())) {
-                throw new RuntimeException("Invalid OTP");
-            }
-            // Reset password
-            forgetPasswordService.resetPassword(request.getToken(), request.getNewPassword());
-
-            ResetPasswordResponse response = new ResetPasswordResponse("SUCCESS", "Password has been reset successfully");
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            log.error("Error in resetPassword: ", e);
-            ResetPasswordResponse response = new ResetPasswordResponse("FAILURE", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        return forgetPasswordService.handleResetPassword(request);
     }
 }

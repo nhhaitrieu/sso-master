@@ -29,6 +29,7 @@ public class User {
 
     @XmlElement(name = "UserID")
     @NotNull(message = "Username cannot be null")
+    @Column(unique = true, nullable = false)
     private String username;
 
     @XmlElement(name = "Password")
@@ -36,6 +37,7 @@ public class User {
 
     @XmlElement(name = "Email")
     @Email(message = "Invalid email format")
+    @Column(unique = true, nullable = false)
     private String email;
 
     @XmlElement(name = "Role")
@@ -50,9 +52,8 @@ public class User {
 
     @NotNull(message = "MSISDN cannot be null")
     @XmlElement(name = "MSISDN")
-    @Pattern( regexp = "(\\+84|0)[0-9]{9}|\\+[1-9][0-9]{1,3}[0-9]{6,12}",
-            message = "MSISDN must be valid: '+84' or '0' followed by 9 digits, or '+' with country code and subscriber number")
     @ValidMsisdn // <-- Dùng validator custom tại đây!
+    @Column(unique = true, nullable = false)
     private String msisdn;
 
     @XmlElement(name = "Status")

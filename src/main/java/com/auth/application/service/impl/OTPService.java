@@ -93,4 +93,9 @@ public class OTPService {
     public void clearOTP(String email) {
         otpStorage.remove(email);
     }
+
+    // Lấy OTP từ storage để kiểm tra
+    public String getOTP(String email) {
+        return otpStorage.get(email);
+    }
 }
